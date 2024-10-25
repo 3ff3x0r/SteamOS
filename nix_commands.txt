@@ -1,0 +1,28 @@
+nano ~/.config/nixpkgs/config.nix #edits the packages groups
+
+
+nix-env -i devapps # Install all packages under devapps group
+nix-env -q  # Find packages and groups that are installed
+nix-env --uninstall devapps  # Uninstall all apps under devapps group
+nix-store --gc # Garbage collect removed apps
+nix-channel --update # Update channels. May be required after using --gc
+nix-env -u '*' # Upgrade all packages
+nix-env -iA nixpkgs.package_name #install an isolated package, not recommended bvc it's hard to manage
+nix-env --uninstall package_name
+
+nix-env -f '<nixpkgs>' -iA myDevApps --show-trace -v #install environment
+
+Nix Installation
+--- ------------
+
+sudo chown -R deck /nix
+sh <(curl -L https://nixos.org/nix/install) --no-daemon
+
+#reboot the system
+
+. /home/deck/.nix-profile/etc/profile.d/nix.sh
+nix --version #test if the installation is ok
+
+some tutorials: https://matthewrhone.dev/nixos-package-guide#:~:text=To%20install%20a%20package%20just,any%20operation%20of%20nix%2Denv%20.
+nix packages search: https://search.nixos.org/packages
+LD_LIBRARY_PATH="/home/deck/.nix-profile/lib:/usr/local/lib"

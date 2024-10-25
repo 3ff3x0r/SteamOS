@@ -1,0 +1,90 @@
+# ~/.bashrc
+
+# If not running interactively, don't do anything
+[[ $- != *i* ]] && return
+
+#export XDG_DATA_DIRS="/home/deck/.nix-profile/share:${XDG_DATA_DIRS:-/usr/share:/usr/local/share}"
+export XDG_DATA_DIRS="${XDG_DATA_DIRS:-/usr/share:/usr/local/share}"
+
+#export LD_LIBRARY_PATH="/home/deck/.nix-profile/lib:/usr/local/lib:/usr/lib:/lib:/usr/lib64"
+export LD_LIBRARY_PATH="/usr/local/lib:/usr/lib:/lib:/usr/lib64"
+
+# Function to activate Anaconda environment when needed
+conda-activate() {
+    # >>> conda initialize >>>
+    __conda_setup="$('/home/deck/anaconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+    if [ $? -eq 0 ]; then
+        eval "$__conda_setup"
+    else
+        if [ -f "/home/deck/anaconda3/etc/profile.d/conda.sh" ]; then
+            . "/home/deck/anaconda3/etc/profile.d/conda.sh"
+        else
+            export PATH="$PATH:/home/deck/anaconda3/bin"
+        fi
+    fi
+    unset __conda_setup
+    # <<< conda initialize <<<
+    
+    # Add Anaconda libraries to LD_LIBRARY_PATH after activation
+    export LD_LIBRARY_PATH="/home/deck/anaconda3/lib:$LD_LIBRARY_PATH"
+    conda activate base
+    echo "Anaconda environment activated"
+}
+
+# Function to deactivate Anaconda environment
+conda-deactivate() {
+    # Remove Anaconda from PATH if it's there
+    export PATH=$(echo $PATH | sed 's|/home/deck/anaconda3/bin:||g')
+    
+    # Reset LD_LIBRARY_PATH to original value without Anaconda
+    export LD_LIBRARY_PATH="/usr/local/lib:/usr/lib:/lib:/usr/lib64"
+    
+    # Deactivate conda if it's active
+    if [ ! -z "$CONDA_PREFIX" ]; then
+        conda deactivate
+    fi
+    echo "Anaconda environment deactivated"
+}
+
+#Function to work with nix packages
+nix-activate() {
+        if [ "$CONDA_DEFAULT_ENV" == "" ]; then
+#               echo "CONDA_PREFIX is set to 'nix'."
+		export OLD_LIBS="$LD_LIBRARY_PATH"
+		export LD_LIBRARY_PATH="/home/deck/.nix-profile/lib:/usr/local/lib"
+        export OLD_XDG="$XDG_DATA_DIRS"
+		# Set XDG_DATA_DIRS for Nix (keeping Nix at the beginning)
+        export XDG_DATA_DIRS="/home/deck/.nix-profile/share:$XDG_DATA_DIRS"
+       	export CONDA_DEFAULT_ENV="nix"
+       	if [ -e /home/deck/.nix-profile/etc/profile.d/nix.sh ]; then . /home/deck/.nix-profile/etc/profile.d/nix.sh; fi
+        echo "Nix environment activated"
+	else
+
+		echo "You are in $CONDA_DEFAULT_ENV environment. Aborted."
+	fi
+	}
+nix-deactivate () {
+	if [ "$CONDA_DEFAULT_ENV" == "nix" ]; then
+#	    	echo "CONDA_PREFIX is set to 'nix'."
+  		export LD_LIBRARY_PATH="$OLD_LIBS"
+        export XDG_DATA_DIRS="$OLD_XDG"
+  		export CONDA_DEFAULT_ENV=""
+		export OLD_LIBS=""
+		export OLD_XDG=""
+		echo "Nix environment deactivated"
+	else
+        echo "You are not in Nix-env."
+	fi
+		}
+anaconda-navigator() {
+    	conda-activate
+    	conda activate base
+    	~/anaconda3/bin/anaconda-navigator
+    }
+jupyter-notebook() {
+    	conda-activate
+    	conda activate DataScy  
+    	~/anaconda3/bin/jupyter-notebook
+	conda-deactivate	
+    }
+neofetch

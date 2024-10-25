@@ -1,0 +1,21 @@
+{ pkgs ? import <nixpkgs> {} }:
+
+{
+  allowUnfree = true; # Allow non-free packages
+
+  packageOverrides = pkgs: {
+    myDevApps = pkgs.buildEnv {
+      name = "devapps"; # Name of the environment
+      paths = with pkgs; [
+        vscode               # Keep Visual Studio Code from nixpkgs
+        firefox              # Firefox browser
+        gtk3                 # GTK 3 for graphical interface
+        gdk-pixbuf           # For image loading in GTK apps
+        mesa                 # Include mesa for OpenGL support
+        glibc                # GNU C Library for locale support
+        # Add any additional packages you need here
+      ];
+    };
+  };
+}
+	
