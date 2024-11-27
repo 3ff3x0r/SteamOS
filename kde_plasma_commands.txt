@@ -1,0 +1,7 @@
+# install the widget:
+plasmapkg2 --install tiledmenu.plasmoid
+# restarting Plasma:
+kquitapp5 plasmashell && kstart5 plasmashell
+
+# edit mimeapps.list
+nano .config/mimeapps.list
